@@ -28,8 +28,8 @@ func draw_card(flipped: bool):
 	var card = card_scene.instantiate()
 	card.init(data[0], data[1], flipped)
 	
-	var x = self.global_position.x + randi_range(-180, 180)
-	var y = self.global_position.y + randi_range(-150, 150)
+	var x = self.global_position.x + randi_range(-260, 260)
+	var y = self.global_position.y + randi_range(-180, 180)
 	
 	card.set_global_position(Vector2(x, y))
 	
