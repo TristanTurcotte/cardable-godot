@@ -4,9 +4,11 @@ This is a card game "engine" used to play with playing cards in a sandbox enviro
 
 Makes use of [Godot 4 2D engine](https://godotengine.org/).
 
+![Cards randomly being drawn](readme/cards.gif)
+
 ## How to play ?
 
-Since the game is still in active development, to play this game you will have to have Godot 4 installed on your device.
+Since the game is still in active development, to play this game you will have to have Godot 4 installed on your device. Be advised that there's currently nothing to actually _play_.
 
 1. Download and install Godot 4 from their [website](https://godotengine.org/download/).
 2. Download this git repository by clicking the green "Code" button, then clicking "Download ZIP".
