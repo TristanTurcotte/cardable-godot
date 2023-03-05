@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://drhpum8mqwfo8"]
+
+[ext_resource type="Script" path="res://scenes/deck/deck.gd" id="1_5kd7b"]
+[ext_resource type="Texture2D" uid="uid://cvdrf7m1pikw7" path="res://resources/cards/deck_placeholder.png" id="1_dqf75"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_81n0c"]
+size = Vector2(90, -135)
+orientation = 2
+
+[node name="Deck" type="Node2D"]
+script = ExtResource("1_5kd7b")
+
+[node name="DeckShape" type="MeshInstance2D" parent="."]
+position = Vector2(45, 67.5)
+mesh = SubResource("PlaneMesh_81n0c")
+texture = ExtResource("1_dqf75")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.25
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

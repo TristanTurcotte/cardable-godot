@@ -29,8 +29,7 @@ func notify_texture_update():
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.update_texture()
-	self.update_shape()
-	
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -43,23 +42,3 @@ func update_texture():
 	var text = get_card_texture() # Set the card's texture based off of it's initial value
 	self.set_texture(text)
 	update_texture_flag = false
-
-func update_shape():
-	var parent = get_parent()
-	
-	var width = parent.card_width
-	var height = parent.card_height
-	
-	var mesh = self.get_mesh()
-	var curr_width = mesh.size.x
-	var curr_height = mesh.size.y
-	
-	var width_do_update = -width != curr_width
-	var height_do_update = height != curr_height
-	
-	if width_do_update:
-		mesh.size.x = -width
-		self.position.x = width / 2
-	if height_do_update:
-		mesh.size.y = height
-		self.position.y = height / 2

@@ -11,14 +11,19 @@ const VALUE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 @export_enum("Hearts", "Diamonds", "Clubs", "Spades") var card_suit = 0
 # Represents what this card's value index is (0-12)
 @export_enum("Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King") var card_value = 0
-# Width of the card in pixels
-@export var card_width = 90
-# Height of the card in pixels
-@export var card_height = 135
 
 var flipped = false
 
-@onready var shape = self.find_child("CardShape", false, false)
+@onready var shape = self.find_child("CardShape")
+
+# Initialize this card, set the suit, value, and if it is flipped or not.
+# flip being true will mean the value will be facing down and you will see the card's back.
+func init(suit, value, flip):
+	if flip:
+		flip_card()
+	
+	if !set_card(suit, value):
+		set_card(0, 0)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -31,7 +36,8 @@ func _ready():
 # Flip the card
 func flip_card():
 	flipped = !flipped
-	shape.notify_texture_update()
+	if shape != null:
+		shape.notify_texture_update()
 	print_debug("Flipping the card for it to be %s" % ("hidden" if flipped else "revealed"))
 
 # Reveals the card, if the card was already revealed it won't do anything.
@@ -49,6 +55,12 @@ func hide_card():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
+
+func randomize_card():
+	card_suit = randi_range(0, 3)
+	card_value = randi_range(0, 12)
+	if shape != null:
+		shape.notify_texture_update()
 
 # Returns a String representation of this card's suit & value.
 func get_card_name() -> String:
@@ -79,14 +91,19 @@ func get_value_name() -> String:
 func get_value_index() -> int:
 	return self.card_value
 
-func set_card(suit_index, value_index):
+func set_card(suit_index, value_index) -> bool:
 	if suit_index >= SUITS_LEN || suit_index < 0 || value_index >= VALUES_LEN || value_index < 0:
 		print_debug("ERROR: Invalud suit=%s or value=%s index" % [suit_index, value_index])
-		return
+		return false
 	self.card_suit = suit_index
 	self.card_value = value_index
-	shape.notify_texture_update()
+	if shape != null:
+		shape.notify_texture_update()
+	return true
 
 func _on_timer_timeout():
-	if randi_range(0, 100) > 80:
+	var val = randi_range(0,100)
+	if val > 80:
 		flip_card()
+	elif val < 10:
+		randomize_card()
