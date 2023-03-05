@@ -30,7 +30,20 @@ There are always more and more extensive things that can be done, but currently 
 - Have a few different default rulesets that come with the game which can be used immediately and act as examples of how to create your own ruleset.
   - Users can create their own rulesets with their own custom cards and define custom behaviour/actions.
   - Rulesets would control how a `round/game` is played and define what can and cannot be done by the GM and regular players. Also controls how the player's are organized, for example if they are all at their own tables or if they share a table and if so, which part of the table is considered theirs.
-  - Potential example default rulesets: Blackjack/21, Go Fish, Texas Hold 'em/Poker, etc.
+  - Potential example default rulesets: Blackjack/21, Go Fish, Texas Hold 'em/Poker, [Skull](https://boardgamegeek.com/boardgame/92415/skull), etc.
+- Actions that can be peformed by a player:
+  - Click on cards to select them, select multiple cards by dragging a box or shift+clicking. Ctrl+click to remove an item from your selection.
+  - Can right click to get a context menu on the selected items.
+  - Click and drag to move cards around, if the cards don't like where the ended up, they'll go back to where they came from/teleport to the player's `area`.
+  - Context menu for `cards` to do various actions (These are `primitive` actions):
+    - Flip, discard, count, return to deck
+  - Context menu for `decks` to do various actions:
+    - Draw card and reveal it (for yourself), draw card and keep value hidden (for yourself), send card to player hand, send card to player field, send card to table, shuffle deck (Don't replenish the deck), reset (Get a full deck and have it shuffled), pull cards from table (Take all cards that are in play that came from this deck and put them back into the deck)
+  - If there's camera movement, the player would either click to switch between different preset cameras, OR they would use wasd/mouse to edge to move the camera around.
+- Depending on the ruleset, some actions cannot be performed by a player, and some actions can be performed, but only with the GM's permission. If the action appeared in the context menu, it would, for example, show up as `Request to draw card`, and the GM would be notified in some way and then be able to approve/reject the request at their leisure.
+- Simple chat mechanism to allow players to send in-game text messages. Could show important actions that take place in the chat as well. Custom messages can be created in a ruleset and defined by a user.
+- In-game ruleset editor?
+- Include ability to roll any number of dice of any size, D2, D3, D4, ... D20, D2000, etc.
 
 ## License ?
 
