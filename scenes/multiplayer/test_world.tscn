@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://cajoscp40aom3"]
+
+[ext_resource type="PackedScene" uid="uid://drhpum8mqwfo8" path="res://scenes/deck/deck.tscn" id="1_vc8m1"]
+
+[node name="World" type="Node2D"]
+process_mode = 1
+
+[node name="Deck" parent="." instance=ExtResource("1_vc8m1")]
+position = Vector2(595, 305)
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/playing_card/playing_card.tscn")
+spawn_path = NodePath("..")

@@ -11,8 +11,8 @@ var update_texture_flag = false
 
 # Returns the texture data that coorisponds with this card's suit & value.
 func get_card_texture() -> Resource:
-	var parent = get_parent()
-	if !parent.flipped:
+	var parent = get_parent() as PlayingCard
+	if !parent.get_flipped():
 		var index = parent.get_suit_index() * 13 + parent.get_value_index()
 		if index >= textures.size():
 			print_debug("Was unable to get the correct texture index %s. suit = %s, value = %s" % [index, parent.card_suit, parent.card_value])
@@ -42,3 +42,4 @@ func update_texture():
 	var text = get_card_texture() # Set the card's texture based off of it's initial value
 	self.set_texture(text)
 	update_texture_flag = false
+	print_debug("Texture updated!")

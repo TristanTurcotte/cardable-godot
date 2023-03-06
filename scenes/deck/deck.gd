@@ -1,7 +1,7 @@
 extends Node2D
-
+class_name Deck
 # The root object of this PackedScene must have a init(int, int, bool) function.
-@export var card_scene: PackedScene
+@export var card_scene: PackedScene = preload("res://scenes/playing_card/playing_card.tscn")
 
 var init_deck = []
 
@@ -9,7 +9,7 @@ var contents = []
 var cards_out_in_the_world = []
 
 func init():
-	set_contents(default_deck())
+	set_contents(Deck.default_deck())
 	contents.shuffle()
 
 # Sets the content of this deck
@@ -34,9 +34,10 @@ func draw_card(flipped: bool = false):
 	if contents.is_empty():
 		return
 	
-	var data = index_to_card(contents.pop_back())
+	var data = Deck.index_to_card(contents.pop_back())
 	
 	var card = card_scene.instantiate()
+	print("Doing the instantiate!")
 	card.init(data[0], data[1], flipped, self)
 	
 	var x = self.global_position.x + randi_range(-400, 400)
@@ -44,7 +45,7 @@ func draw_card(flipped: bool = false):
 	
 	card.set_global_position(Vector2(x, y))
 	
-	get_parent().add_child(card)
+	get_parent().add_child(card, true)
 	cards_out_in_the_world.push_back(card) # Add the card to our own list of cards that exist. Doing this the Godot way would probably be to create a Group for each deck that cards would be added to send a signal to.
 
 # Shuffle the deck. If `retrieve_cards` is false, just shuffle what we've got. If
@@ -54,7 +55,7 @@ func shuffle_deck(retrieve_cards: bool = false):
 	if retrieve_cards && !cards_out_in_the_world.is_empty():
 		for i in cards_out_in_the_world.size():
 			var card = cards_out_in_the_world.pop_front()
-			var index = get_card_index(card.get_suit_index(), card.get_value_index())
+			var index = Deck.get_card_index(card.get_suit_index(), card.get_value_index())
 			contents.push_back(index)
 			card.queue_free()
 	
@@ -94,7 +95,7 @@ static func default_deck():
 	
 	for suit in 4:
 		for face in 13:
-			deck.push_back(get_card_index(suit, face))
+			deck.push_back(Deck.get_card_index(suit, face))
 	
 	return deck
 
@@ -102,7 +103,7 @@ func _on_timer_timeout():
 	if cards_left() > 0:
 		draw_card(randi_range(0, 3) == 1)
 	else:
-		reset_deck()
+		shuffle_deck(true)
 
 
 func _on_delay_timer_timeout():

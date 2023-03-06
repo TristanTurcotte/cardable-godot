@@ -18,6 +18,7 @@ func _on_host_pressed():
 	var peer = ENetMultiplayerPeer.new()
 	peer.create_server(PORT)
 	if peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
+		print("FAILURE! WITH HOSTING")
 		OS.alert("Failed to start multiplayer server.")
 		return
 	multiplayer.multiplayer_peer = peer
@@ -32,6 +33,7 @@ func _on_connect_pressed():
 	var peer = ENetMultiplayerPeer.new()
 	peer.create_client(txt, PORT)
 	if peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
+		print("FAILURE!")
 		OS.alert("Failed to start multiplayer client.")
 		return
 	multiplayer.multiplayer_peer = peer
@@ -41,3 +43,19 @@ func start_game():
 	# Hide UI and unpause the game
 	$UI.hide()
 	get_tree().paused = false
+	
+	if multiplayer.is_server():
+		change_level.call_deferred(load("res://scenes/multiplayer/test_world.tscn"))
+
+func change_level(scene: PackedScene):
+	var level = $Level
+	for c in level.get_children():
+		level.remove_child(c)
+		c.queue_free()
+	level.add_child(scene.instantiate())
+
+func _input(event):
+	if not multiplayer.is_server():
+		return
+	if event.is_action("ui_home") and Input.is_action_just_pressed("ui_home"):
+		change_level.call_deferred(load("res://scenes/multiplayer/test_world.tscn"))

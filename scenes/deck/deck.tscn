@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://drhpum8mqwfo8"]
+[gd_scene load_steps=5 format=3 uid="uid://drhpum8mqwfo8"]
 
 [ext_resource type="Script" path="res://scenes/deck/deck.gd" id="1_5kd7b"]
 [ext_resource type="Texture2D" uid="uid://cvdrf7m1pikw7" path="res://resources/cards/deck_placeholder.png" id="1_dqf75"]
@@ -6,6 +6,17 @@
 [sub_resource type="PlaneMesh" id="PlaneMesh_81n0c"]
 size = Vector2(90, -135)
 orientation = 2
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ydkhr"]
+properties/0/path = NodePath(".:card_scene")
+properties/0/spawn = true
+properties/0/sync = true
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/sync = true
+properties/2/path = NodePath(".:script")
+properties/2/spawn = true
+properties/2/sync = true
 
 [node name="Deck" type="Node2D"]
 script = ExtResource("1_5kd7b")
@@ -23,6 +34,10 @@ wait_time = 0.133
 wait_time = 4.0
 one_shot = true
 autostart = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.05
+replication_config = SubResource("SceneReplicationConfig_ydkhr")
 
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_timer_timeout"]
 [connection signal="timeout" from="DelayTimer" to="." method="_on_delay_timer_timeout"]

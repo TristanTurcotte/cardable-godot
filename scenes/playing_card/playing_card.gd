@@ -1,5 +1,7 @@
 extends Node2D
 
+class_name PlayingCard
+
 # Generic card data
 const SUITS = ["Hearts", "Diamonds", "Clubs", "Spades"]
 const SUITS_LEN = 4
@@ -12,7 +14,8 @@ const VALUE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 # Represents what this card's value index is (0-12)
 @export_enum("Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King") var card_value = 0
 
-var flipped = false
+# When false, the card is face up. When true, it is face down.
+@export var flipped = false
 var deck_of_origin = null # Unused.
 
 @onready var shape = self.find_child("CardShape")
@@ -31,17 +34,14 @@ func init(suit, value, flip, deck = null):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	card_suit = randi_range(0, 3)
-	card_value = randi_range(0, 12)
-	print_debug("My shape is %s" % shape)
-	shape.notify_texture_update()
-	print_debug("We've got a(n) %s" % get_card_name())
+	print_debug("My shape is %s, type=%s" % [shape, get_card_name()])
+	shape.notify_texture_update.call_deferred()
 
 # Flip the card
 func flip_card():
 	flipped = !flipped
 	if shape != null:
-		shape.notify_texture_update()
+		shape.notify_texture_update.call_deferred()
 	print_debug("Flipping the card for it to be %s" % ("hidden" if flipped else "revealed"))
 
 # Reveals the card, if the card was already revealed it won't do anything.
@@ -64,7 +64,7 @@ func randomize_card():
 	card_suit = randi_range(0, 3)
 	card_value = randi_range(0, 12)
 	if shape != null:
-		shape.notify_texture_update()
+		shape.notify_texture_update.call_deferred()
 
 # Returns a String representation of this card's suit & value.
 func get_card_name() -> String:
@@ -95,6 +95,9 @@ func get_value_name() -> String:
 func get_value_index() -> int:
 	return self.card_value
 
+func get_flipped():
+	return self.flipped
+
 func set_card(suit_index, value_index) -> bool:
 	if suit_index >= SUITS_LEN || suit_index < 0 || value_index >= VALUES_LEN || value_index < 0:
 		print_debug("ERROR: Invalud suit=%s or value=%s index" % [suit_index, value_index])
@@ -102,7 +105,7 @@ func set_card(suit_index, value_index) -> bool:
 	self.card_suit = suit_index
 	self.card_value = value_index
 	if shape != null:
-		shape.notify_texture_update()
+		shape.notify_texture_update.call_deferred()
 	return true
 
 func _on_timer_timeout():
