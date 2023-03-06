@@ -20,7 +20,7 @@ How user content is created and managed is the cornerstone of this project, as `
 
 Here's an example `.json` file showing a potential format for creating custom `card sets`:
 
-```json
+```jsonc
 {
     "cardset": {
         "set_name": "Standard Playing Cards",
@@ -38,6 +38,7 @@ Here's an example `.json` file showing a potential format for creating custom `c
                     "green": 0,
                     "blue": 0,
                 },
+                "suit_back_override": "" // Can include texture override for an entire suit's back
             },
             {
                 // ...
@@ -76,7 +77,7 @@ A card set would define all the individual unique card types that are available,
 
 The content of the deck config file is simply an array of card_ids and the name of the card set the deck uses. Here's an example `.json` of a deck config file, in this case `deck-std-no-joker.json`:
 
-```json
+```jsonc
 {
     "deck": {
         "deck_name": "Standard, No Jokers",
@@ -94,7 +95,7 @@ The content of the deck config file is simply an array of card_ids and the name 
 - Declares when actions can be performed.
 - ...
 
-```json
+```jsonc
 {
 
 }
