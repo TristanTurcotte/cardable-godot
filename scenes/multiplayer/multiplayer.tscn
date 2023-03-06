@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=3 uid="uid://cfktrc7wubfgu"]
+
+[ext_resource type="Script" path="res://scenes/multiplayer/multiplayer.gd" id="1_uhe81"]
+[ext_resource type="PackedScene" uid="uid://drhpum8mqwfo8" path="res://scenes/deck/deck.tscn" id="2_dnwlb"]
+
+[node name="Multiplayer" type="Node"]
+script = ExtResource("1_uhe81")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Net" type="VBoxContainer" parent="UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Options" type="HBoxContainer" parent="UI/Net"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Net/Options"]
+layout_mode = 2
+
+[node name="Host" type="Button" parent="UI/Net/Options"]
+layout_mode = 2
+
+[node name="Connect" type="Button" parent="UI/Net/Options"]
+layout_mode = 2
+
+[node name="Remote" type="LineEdit" parent="UI/Net/Options"]
+layout_mode = 2
+
+[node name="Level" type="Node" parent="."]
+
+[node name="World" type="Node2D" parent="Level"]
+
+[node name="Deck" parent="Level/World" instance=ExtResource("2_dnwlb")]
