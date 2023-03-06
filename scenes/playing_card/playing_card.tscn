@@ -1,11 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dmc8lyi6fhlii"]
 
-[ext_resource type="Script" path="res://scenes/playing_card/CardShape.gd" id="1_fn05v"]
 [ext_resource type="Script" path="res://scenes/playing_card/playing_card.gd" id="1_k3mxh"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_2jvnq"]
-size = Vector2(-90, 135)
-orientation = 2
+[ext_resource type="Texture2D" uid="uid://btm53kjj6ck6b" path="res://resources/cards/00_09.png" id="2_llrwj"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_kwu3t"]
 properties/0/path = NodePath(".:card_suit")
@@ -23,19 +19,21 @@ properties/3/sync = true
 properties/4/path = NodePath(".:script")
 properties/4/spawn = true
 properties/4/sync = true
+properties/5/path = NodePath("MeshInstance2D:texture")
+properties/5/spawn = true
+properties/5/sync = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_6wfcj"]
+size = Vector2(-90, 135)
 
 [node name="PlayingCard" type="Node2D"]
 script = ExtResource("1_k3mxh")
-
-[node name="CardShape" type="MeshInstance2D" parent="."]
-position = Vector2(45, 67.5)
-mesh = SubResource("PlaneMesh_2jvnq")
-script = ExtResource("1_fn05v")
-
-[node name="Timer" type="Timer" parent="."]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 0.05
 replication_config = SubResource("SceneReplicationConfig_kwu3t")
 
-[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+position = Vector2(45, 67.5)
+mesh = SubResource("QuadMesh_6wfcj")
+texture = ExtResource("2_llrwj")

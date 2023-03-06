@@ -13,6 +13,13 @@ func _ready():
 		print("Automatically starting dedicated server.")
 		_on_host_pressed.call_deferred()
 
+func _process(delta):
+	var peer = multiplayer.multiplayer_peer
+	if peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
+		print("Disconnected!")
+		get_tree().paused = true
+		$UI.show()
+
 func _on_host_pressed():
 	# Start as server
 	var peer = ENetMultiplayerPeer.new()
@@ -57,5 +64,5 @@ func change_level(scene: PackedScene):
 func _input(event):
 	if not multiplayer.is_server():
 		return
-	if event.is_action("ui_home") and Input.is_action_just_pressed("ui_home"):
+	if event.is_action("ui_select") and Input.is_action_just_pressed("ui_select"):
 		change_level.call_deferred(load("res://scenes/multiplayer/test_world.tscn"))

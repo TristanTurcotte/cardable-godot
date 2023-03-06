@@ -18,7 +18,7 @@ properties/2/path = NodePath(".:script")
 properties/2/spawn = true
 properties/2/sync = true
 
-[node name="Deck" type="Node2D"]
+[node name="Deck" type="Node2D" groups=["decks"]]
 script = ExtResource("1_5kd7b")
 
 [node name="DeckShape" type="MeshInstance2D" parent="."]

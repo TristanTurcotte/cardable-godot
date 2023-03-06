@@ -30,15 +30,17 @@ func _process(delta):
 
 # Draw a card, flipped or not. The card is randomly thrown.
 func draw_card(flipped: bool = false):
-	print("Drawing..")
 	if contents.is_empty():
 		return
 	
 	var data = Deck.index_to_card(contents.pop_back())
 	
 	var card = card_scene.instantiate()
-	print("Doing the instantiate!")
 	card.init(data[0], data[1], flipped, self)
+	####
+	get_tree().call_group("label", "update_dat_label", "%s" % card.get_card_name())
+	
+	####
 	
 	var x = self.global_position.x + randi_range(-400, 400)
 	var y = self.global_position.y + randi_range(-220, 220)
