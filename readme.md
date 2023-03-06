@@ -51,7 +51,7 @@ Currently the code and Godot project files for this game are considered __PROPRI
 
 I do not own the following assets:
 
-- `deck_placeholder.png`: David Bellot - Berkeley, CA, USA 08/12/2005 - David's web, [LGPL](http://www.gnu.org/licenses/lgpl.html), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Card_back_01.svg).
+- `Card_back_01.svg.png`: David Bellot - Berkeley, CA, USA 08/12/2005 - David's web, [LGPL](http://www.gnu.org/licenses/lgpl.html), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Card_back_01.svg).
 - Card image files, `00_00.png` .. `03_12.png`: WikimediaImages on Pixabay.com, [link to pixabay](https://pixabay.com/images/id-884206/).
   - Any changes to the resultings images were made by me.
 
