@@ -13,17 +13,21 @@ const VALUE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 @export_enum("Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King") var card_value = 0
 
 var flipped = false
+var deck_of_origin = null # Unused.
 
 @onready var shape = self.find_child("CardShape")
 
 # Initialize this card, set the suit, value, and if it is flipped or not.
 # flip being true will mean the value will be facing down and you will see the card's back.
-func init(suit, value, flip):
+func init(suit, value, flip, deck = null):
 	if flip:
 		flip_card()
 	
 	if !set_card(suit, value):
 		set_card(0, 0)
+	
+	if deck != null:
+		deck_of_origin = deck # Currently unused, and it may be taking up some memory?
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
