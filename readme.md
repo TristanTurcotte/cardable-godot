@@ -45,6 +45,13 @@ There are always more and more extensive things that can be done, but currently 
 - In-game ruleset editor?
 - Include ability to roll any number of dice of any size, D2, D3, D4, ... D20, D2000, etc.
 
+### Anymore info ? Other docs ?
+
+There is more detailed, specific information in the `/docs/` folder.
+
+- __[/docs/user_content.md](/docs/user_content.md)__ : Describes how user content would be defined, the creation of `rulesets`, `card sets`, and `decks`.
+- ...
+
 ## License ?
 
 Currently the code and Godot project files for this game are considered __PROPRIETARY__. You can freely download the code and run the game, and edit it, as long as you __DO NOT__ _share_, _distribute_, _commercialize_, or _otherwise make use of to make a profit from_ the result. This work may make use of freely available assets, I am not claiming ownership of these assets. If you make changes to the game and want those changes reflected in the final product, you can submit a Pull Request and you can be added to the credits.
