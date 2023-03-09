@@ -262,22 +262,15 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                 "value": "",
                 "type": "player", // This can be omitted, or provided with 'any'
             },
+            {
+                "key": "placed_cards",
+                "value": 0, // type is implied
+            },
         ],
         "game_state": [
             {
                 "state_name": "deck_selection",
-                "state_type": "auto",
-                "state_params": [
-                    {
-                        "param": "", // parameter name/identifier
-                        "type": "", // type of parameter
-                    },
-                ],
-                "state_data": [
-                    {
-                        "key": "", // data name/identifier, if same as a param, will receive value from whatever argument value is passed in the parameter's place
-                    },
-                ],
+                "state_type": "auto", // All inner actions are auto, so the state is auto, can be omitted
                 "actions": [ // This state will not be how this kind of thing would be achieved in the final API, still thinking about alternatives
                     {
                         "action_name": "pick_deck",
@@ -351,16 +344,24 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                             "type": "center_screen",
                             "size": 60,
                             "text": "You must choose a card from your hand to play facedown!",
-                            "time": -1, // The message will be on screen the entire time until this action is taken (since there is no 'condition' field)
+                            "time": -1, // The message will be on screen the entire time until this action is taken/no longer available (since there is no 'condition' field)
                         },
                         "type": "hand_pick",
                         "type_params": 1, // Optional, but says to 'hand_pick' to only accept 1 card
-                        "primitives": {
-                            "endpoint": "place_card",
-                            "params": [
-                                "action.hand_pick", "player.front", true // Place card, the card the player picked, placed at the location called "front" belonging to the player, while facedown
-                            ],
-                        },
+                        "primitives": [
+                            {
+                                "endpoint": "place_card",
+                                "params": [
+                                    "action.hand_pick", "player.front", true // Place card, the card the player picked, placed at the location called "front" belonging to the player, while facedown
+                                ],
+                            },
+                            {
+                                "endpoint": "increment",
+                                "params": [
+                                    "globals.placed_cards", 1 // Increase the value stored in the variable 'placed_cards' by 1
+                                ]
+                            }
+                        ],
                     },
                     {
                         "action_name": "transition",
@@ -402,30 +403,123 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                         "primitives": [
                             {
                                 "endpoint": "prompt_number",
-                                "params": [
-                                    "action.player_bet"
+                                "params": [ // Ask the user for a number between (and including) 1 and the number of cards placed
+                                    "action.player_bet", 1, "globals.placed_cards"
                                 ],
                             },
                             {
-                                // wip
+                                "endpoint": "state_transition",
+                                "params": [ // Go to state called 'round_phase_two', pass along the player data, and the player_bet
+                                    "round_phase_two", "player", "action.player_bet"
+                                ]
                             }
                         ],
                     },
-                    {
-                        "action_name": "transition",
-                        "type": "auto",
-                        "condition": {
-                            "endpoint": "is_equal", // Are the two arguments passed equal?
-                            "params": [ "active_players", 0 ], // active_players returns how many people can still select an action
-                        },
-                        "primitives": {
-                            "endpoint": "state_transition",
-                            "params": "round_phase_one",
-                        }
-                    }
                 ]
             },
             {
+                "state_name": "round_phase_two", // The betting round
+                "state_params": [
+                    {
+                        "param": "initiating_player", // parameter name/identifier
+                        "type": "player", // type of parameter
+                    },
+                    {
+                        "param": "origin_bet",
+                        "type": "number", // should int be specified? Since number could be a float?
+                    },
+                ],
+                "state_data": [
+                    {
+                        "key": "initiating_player", // data name/identifier, if same as a param, will receive value from whatever argument value is passed in the parameter's place
+                    },
+                    {
+                        "key": "origin_bet",
+                    },
+                    {
+                        "key": "winning_player",
+                        "value": "state.initiating_player",
+                    },
+                    {
+                        "key": "current_bet",
+                        "value": "state.origin_bet",
+                    }
+                ],
+                "state_type": "round_robin",
+                "state_type_param": {
+                    "endpoint": "next_player", // Returns the player who would come after the given player
+                    "params": "state.initiating_player",
+                },
+                "actions": [
+                    {
+                        "action_name": "check_winner",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_equal", // If the current player is who placed the winning bet, do this action!
+                            "params": [ "player", "state.winning_player" ]
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "state_transition",
+                                "params": [
+                                    "round_phase_three", "player", "current_bet"
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        "action_name": "Pass",
+                        "type": "button",
+                        "primitives": [
+                            {
+                                "endpoint": "pass_in_round_robin",
+                                "params": "player",
+                            },
+                        ],
+                    },
+                    {
+                        "action_name": "Can you flip more flowers than the other person? Bet higher!",
+                        "action_message": {
+                            "type": "center_screen",
+                            "size": 60,
+                            "text": "Bet higher than {state.current_bet} or pass!",
+                            "time": -1,
+                        },
+                        "action_data": {
+                            "key": "player_bet",
+                            "type": "number",
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "prompt_number_excl_incl", // first arg is exclusive minimum, second arg is inclusive maximum, e.g. 1-3 would be either 2 or 3.
+                                "params": [
+                                    "action.player_bet", "state.current_bet", "globals.placed_cards"
+                                ],
+                            },
+                            {
+                                "endpoint": "state_transition_if_bet_max",
+                                "condition": { // May want to consider not allowing condition in primitives ? instead go to an auto action?
+                                    "endpoint": "is_equal",
+                                    "params": [ "action.player_bet", "globals.placed_cards" ],
+                                },
+                                "params": [
+                                    "round_phase_three", "player", "action.player_bet"
+                                ]
+                            },
+                            {
+                                "endpoint": "set_state_data", // Probably will be different endpoint for that
+                                "params": [ "state.current_bet", "action.player_bet" ]
+                            },
+                            {
+                                "endpoint": "set_state_data", // Probably will be different endpoint for that
+                                "params": [ "state.winning_player", "player" ]
+                            },
+                        ],
+                    },
+                ]
+            },
+            {
+                "state_name": "round_phase_three", // the round where the betting person has to reveal the # of cards they declared
                 // ... Still needs more states to be a complete game, WIP.
             }
         ]
