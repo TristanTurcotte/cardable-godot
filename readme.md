@@ -62,6 +62,10 @@ I do not own the following assets:
 - Card image files, `00_00.png` .. `03_12.png`: WikimediaImages on Pixabay.com, [link to pixabay](https://pixabay.com/images/id-884206/).
   - Any changes to the resultings images were made by me.
 
+I will be making use of open-source [fonts](/resources/fonts/font_attributions.md) & having them packaged with the game (/resources/fonts/):
+
+- Iosevka Aile & Iosevka Etoile, and bold & italic variations : [Website](https://typeof.net/Iosevka/), [GitHub](https://github.com/be5invis/Iosevka)
+
 ## Credits
 
 Currently this project is only being worked on by myself.

@@ -41,7 +41,7 @@ Here's an example `.json` file showing a potential format for creating custom `c
                     "green": 0,
                     "blue": 0,
                 },
-                "suit_back_override": "", // Can include texture override for an entire suit's back
+                "suit_back_override": "", // Can include texture override for an entire suit's back face
                 "texture_folder_override": "hearts", // Folder name in `resources` folder that contain's this set's textures
             },
             {
@@ -62,6 +62,7 @@ Here's an example `.json` file showing a potential format for creating custom `c
                 "card_name": "Two",
                 "card_id": 1,
                 "card_value": 2,
+                "suit_id": -1, // If symmetrical_deck is false, you would need to declare the suit_id of the cards, here you can either omit it, like the other card objects in this example or have it be -1 (invalid value)
                 "texture_override": "", // card_back_override can be omitted
             },
             {
@@ -95,14 +96,341 @@ The content of the deck config file is simply an array of card_ids and the name 
 }
 ```
 
+The example deck didn't have any repeating card_ids in the content field, but they can be repeated any number of times.
+
 ### Rulesets
 
-- Declares what actions can be performed.
-- Declares when actions can be performed.
-- ...
+At their core, rulesets define the game's possible states and what can occur when the game is in those states, depending on the game, not all players would be in the same game state. In a game that is played consecutively in rounds, players would all generally be within the same game state, and a particular action or set of actions can change the state for all the players and advance the game. In other games where the game flow is more organic and freeform, the game could be playing concurrently (at the same time) in different ways for different people on the same game server.
+
+The basic building blocks for a `ruleset` are, `state`, `action`, `card set`, and `deck`. Potential concept of a `global_state` if a user wants to store a persistent value that is not connected to a particular player (May not be implemented, depending on how the API ends up).
+
+A `state` would define data, what actions are available under defined conditions, what players the state encompasses, and how the state organizes play.
+
+An `action` could define any combination of `primitive_actions` to occur in a sequence, and can conditionally control the game's data and state.
+
+A `primitive_action` would be how to directly interact with the game world, it is the API that content creators will have access to to create their own custom game content. Data, or arguments can also be passed to the primitives when they are declared in an action, this would allow fine grained control of what occurs. An example of a primitive action would be `draw_card`, where arguments can be passed to define to where the card goes (Player hand, or a defined location), and if it is revealed (facedown) or not.
+
+A ruleset file can either refer to outside resources (Such as `decks` and `card sets` json files), or it can declare them in the same file, making it a larger, or "fat" file. Here's an example of a "fat" `ruleset` file that could potentially define a game similar to [Skull](https://boardgamegeek.com/boardgame/92415/skull), `skullable.json`:
 
 ```jsonc
 {
-
+    // Please be aware the API is still very much a work in progress and there may still be some issues or missing features
+    "cardset": {
+        "set_name": "Skull & Flowers",
+        "card_dimensions": {
+            "width": 150,
+            "height": 150,
+        },
+        "suits": [ // Honestly not sure about all the suit names, if trying to match the actual game. We have 6 suits.
+            {
+                "suit_name": "Vikings",
+                "suit_id": 0,
+                "suit_colour": {
+                    "red": 0,
+                    "green": 255,
+                    "blue": 0,
+                },
+                "suit_back_override": "viking_back.png",
+            },
+            {
+                "suit_name": "Samurai",
+                "suit_id": 1,
+                "suit_colour": {
+                    "red": 255,
+                    "green": 0,
+                    "blue": 0,
+                },
+                "suit_back_override": "samurai_back.png",
+            },
+            {
+                "suit_name": "Shamen",
+                "suit_id": 2,
+                "suit_colour": {
+                    "red": 241,
+                    "green": 202,
+                    "blue": 121,
+                },
+                "suit_back_override": "shamen_back.png",
+            },
+            {
+                "suit_name": "Voodoo",
+                "suit_id": 3,
+                "suit_colour": {
+                    "red": 106,
+                    "green": 32,
+                    "blue": 89,
+                },
+                "suit_back_override": "voodoo_back.png",
+            },
+            {
+                "suit_name": "Zulu",
+                "suit_id": 4,
+                "suit_colour": {
+                    "red": 0,
+                    "green": 0,
+                    "blue": 255,
+                },
+                "suit_back_override": "zulu_back.png",
+            },
+            {
+                "suit_name": "Animist",
+                "suit_id": 5,
+                "suit_colour": {
+                    "red": 102,
+                    "green": 100,
+                    "blue": 194,
+                },
+                "suit_back_override": "animist_back.png",
+            },
+        ],
+        "symmetrical_deck": true,
+        "cards": [ // Just need 2 types of cards
+            {
+                "card_name": "Skull",
+                "card_id": 0,
+                "card_value": 1,
+            },
+            {
+                "card_name": "Flower",
+                "card_id": 1,
+                "card_value": 0,
+            },
+        ],
+    },
+    "deck": [ // We are declaring multiple decks, so we use an array of objects [], instead of an object {}
+        {
+            "deck_name": "Vikings",
+            "cardset": "Skull & Flowers",
+            "content": [
+                0, 1, 1, 1
+            ],
+        },
+        {
+            "deck_name": "Samurai",
+            "cardset": "Skull & Flowers",
+            "content": [
+                2, 3, 3, 3
+            ],
+        },
+        {
+            "deck_name": "Shamen",
+            "cardset": "Skull & Flowers",
+            "content": [
+                4, 5, 5, 5
+            ],
+        },
+        {
+            "deck_name": "Voodoo",
+            "cardset": "Skull & Flowers",
+            "content": [
+                6, 7, 7, 7
+            ],
+        },
+        {
+            "deck_name": "Zulu",
+            "cardset": "Skull & Flowers",
+            "content": [
+                8, 9, 9, 9
+            ],
+        },
+        {
+            "deck_name": "Animist",
+            "cardset": "Skull & Flowers",
+            "content": [
+                10, 11, 11, 11
+            ],
+        },
+    ],
+    "ruleset": {
+        "ruleset_name": "Skullable",
+        "description": "Game of bluffs & strategy!",
+        "min_players": 3,
+        "max_players": 6,
+        "cardsets": [
+            "Skull & Flowers",
+        ],
+        "decks": [
+            "Vikings", "Samurai", "Shamen", "Voodoo", "Zulu", "Animist",
+        ],
+        "game_area": {
+            // Define player positions, deck positions (if any), card placement positions in play area, etc.
+            // ...
+        },
+        "global_data": [ // We can store some global data here, could be const or not
+            {
+                "key": "start_player",
+                "value": "",
+                "type": "player", // This can be omitted, or provided with 'any'
+            },
+        ],
+        "game_state": [
+            {
+                "state_name": "deck_selection",
+                "state_type": "auto",
+                "state_params": [
+                    {
+                        "param": "", // parameter name/identifier
+                        "type": "", // type of parameter
+                    },
+                ],
+                "state_data": [
+                    {
+                        "key": "", // data name/identifier, if same as a param, will receive value from whatever argument value is passed in the parameter's place
+                    },
+                ],
+                "actions": [ // This state will not be how this kind of thing would be achieved in the final API, still thinking about alternatives
+                    {
+                        "action_name": "pick_deck",
+                        "action_type": "auto", // Auto actions cannot be picked by a player and act out automatically (In order) when in the state and can be conditionally controlled
+                        "primitives": {
+                            "endpoint": "pick_deck", // Will not be in final API
+                            "params": [
+                                "game.decks", "globals.start_player", // The player to start first in a round will be abstracted out in the final API
+                            ],
+                        },
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "primitives": {
+                            "endpoint": "state_transition",
+                            "params": "pregame",
+                        },
+                    },
+                ],
+            },
+            {
+                "state_name": "pregame",
+                "state_type": "auto",
+                "actions": [
+                    {
+                        "action_name": "choose_player",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_empty",
+                            "params": "globals.start_player",
+                        },
+                        "primitives": {
+                            "endpoint": "pick_random_player",
+                            "params": "globals.start_player",
+                        },
+                    },
+                    {
+                        "action_name": "give_cards",
+                        "type": "auto", 
+                        "primitives": [
+                            {
+                                "endpoint": "empty_hands", // Makes sure everyone has no cards
+                                "params": "all",
+                            },
+                            {
+                                "endpoint": "draw_cards",
+                                "params": [
+                                    "all", 4, "player.deck", "player.hand", // Draw cards, for all players, 4 each, from each player's personal deck, to the player's hand.
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "primitives": {
+                            "endpoint": "state_transition",
+                            "params": "round_start",
+                        },
+                    },
+                ]
+            },
+            {
+                "state_name": "round_start",
+                "state_type": "concurrent", // All players get notified and asked to perform the action at the same time
+                "actions": [
+                    {
+                        "action_name": "Place card facedown",
+                        "action_message": {
+                            "type": "center_screen",
+                            "size": 60,
+                            "text": "You must choose a card from your hand to play facedown!",
+                            "time": -1, // The message will be on screen the entire time until this action is taken (since there is no 'condition' field)
+                        },
+                        "type": "hand_pick",
+                        "type_params": 1, // Optional, but says to 'hand_pick' to only accept 1 card
+                        "primitives": {
+                            "endpoint": "place_card",
+                            "params": [
+                                "action.hand_pick", "player.front", true // Place card, the card the player picked, placed at the location called "front" belonging to the player, while facedown
+                            ],
+                        },
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_equal", // Are the two arguments passed equal?
+                            "params": [ "active_players", 0 ], // active_players returns how many people can still select an action
+                        },
+                        "primitives": {
+                            "endpoint": "state_transition",
+                            "params": "round_phase_one",
+                        }
+                    }
+                ]
+            },
+            {
+                "state_name": "round_phase_one",
+                "state_type": "round_robin",
+                "state_type_param": "globals.start_player",
+                "actions": [
+                    {
+                        "action_name": "Place card facedown",
+                        "type": "hand_pick", // The action is performed by clicking a card in your hand and confirming your choice
+                        "type_params": 1, // Optional, but says to 'hand_pick' to only accept 1 card
+                        "primitives": {
+                            "endpoint": "place_card",
+                            "params": [
+                                "action.hand_pick", "player.front", true // Place card, the card the player picked, placed at the location called "front" belonging to the player, while facedown
+                            ],
+                        },
+                    },
+                    {
+                        "action_name": "Bet # of flowers flipped in a row", // How can I make this more concise?
+                        "type": "button",
+                        "action_data": {
+                            "key": "player_bet",
+                            "type": "number",
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "prompt_number",
+                                "params": [
+                                    "action.player_bet"
+                                ],
+                            },
+                            {
+                                // wip
+                            }
+                        ],
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_equal", // Are the two arguments passed equal?
+                            "params": [ "active_players", 0 ], // active_players returns how many people can still select an action
+                        },
+                        "primitives": {
+                            "endpoint": "state_transition",
+                            "params": "round_phase_one",
+                        }
+                    }
+                ]
+            },
+            {
+                // ... Still needs more states to be a complete game, WIP.
+            }
+        ]
+    },
 }
 ```
+
+The API format will permit `actions` to be defined outside of the `state` definition, allowing for more succinct state action info.
