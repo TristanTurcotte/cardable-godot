@@ -50,7 +50,7 @@ There are always more and more extensive things that can be done, but currently 
 There is more detailed, specific information in the `/docs/` folder.
 
 - __[/docs/user_content.md](/docs/user_content.md)__ : Describes how user content would be defined, the creation of `rulesets`, `card sets`, and `decks`.
-- ...
+- __[/docs/game_concepts.md](/docs/game_concepts.md)__ : Very unfinished/unpolished document which gives a reference as to what basic gameplay building blocks a content creator would have access to to create their content.
 
 ## License ?
 
@@ -62,7 +62,7 @@ I do not own the following assets:
 - Card image files, `00_00.png` .. `03_12.png`: WikimediaImages on Pixabay.com, [link to pixabay](https://pixabay.com/images/id-884206/).
   - Any changes to the resultings images were made by me.
 
-I will be making use of open-source [fonts](/resources/fonts/font_attributions.md) & having them packaged with the game (/resources/fonts/):
+I will be making use of open-source [fonts](/project/resources/fonts/font_attributions.md) & having them packaged with the game (/project/resources/fonts/):
 
 - Iosevka Aile & Iosevka Etoile, and bold & italic variations : [Website](https://typeof.net/Iosevka/), [GitHub](https://github.com/be5invis/Iosevka)
 
