@@ -194,7 +194,7 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                 "card_name": "Flower",
                 "card_id": 1,
                 "card_value": 0
-            }
+            } // TODO: Introduce the score tile card.
         ]
     },
     "deck": [ // We are declaring multiple decks, so we use an array of objects [], instead of an object {}
@@ -265,7 +265,17 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
             {
                 "key": "placed_cards",
                 "value": 0  // type is implied
+            },
+            {
+                "key": "score_to_win",
+                "value": 2
             }
+        ],
+        "player_data": [ // Data that each player may contain related to this ruleset
+            {
+                "key": "score",
+                "value": 0 // This is the default value
+            },
         ],
         "game_state": [
             {
@@ -276,7 +286,7 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                         "action_name": "pick_deck",
                         "type": "auto", // Auto actions cannot be picked by a player and act out automatically (In order) when in the state and can be conditionally controlled
                         "primitives": {
-                            "endpoint": "pick_deck()", // Will not be in final API
+                            "endpoint": "pick_deck()", // Will not be in final API, would instead use type: 'world_pick'
                             "params": [
                                 "$game.decks", "$globals.start_player"  // The player to start first in a round will be abstracted out in the final API
                             ]
@@ -347,7 +357,11 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                             "time": -1  // The message will be on screen the entire time until this action is taken/no longer available (since there is no 'condition' field)
                         },
                         "type": "hand_pick",
-                        "type_params": 1, // Optional, but says to 'hand_pick' to only accept 1 card
+                        "type_params": [
+                            "self", // target
+                            "$player.hand", // hand reference
+                            1 // how many?
+                        ],
                         "primitives": [
                             {
                                 "endpoint": "place_card()",
@@ -385,10 +399,14 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                     {
                         "action_name": "Place card facedown",
                         "type": "hand_pick", // The action is performed by clicking a card in your hand and confirming your choice
-                        "type_params": 1, // Optional, but says to 'hand_pick' to only accept 1 card **TODO: Create different interface for this to allow hand_pick to specify exactly where to pick from
+                        "type_params": [
+                            "self", // target
+                            "$player.hand", // hand reference
+                            1 // how many?
+                        ],
                         "condition": {
                             "endpoint": "is_not_equal()",
-                            "params": [ "$player.cards_in_hand", 0 ]
+                            "params": [ "$player.cards_in_hand()", 0 ]
                         },
                         "primitives": 
                         [
@@ -575,7 +593,7 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                             "text": "You must reveal all your cards before other players' cards!",
                             "time": -1
                         },
-                        "type": "world_pick", // param 1 is source, param 2 is location name
+                        "type": "world_pick", // param 1 is what, param 2 is quantity, param 3 is source, param 4 is location name
                         "type_params": [ "card", 1, "$player", "front" ], // Pick 1 card from the world, can pick from the 'front' area of the acting player
                         "primitives": [
                             {
@@ -619,7 +637,7 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                             "tokens": "$state.count",
                             "time": -1
                         },
-                        "type": "world_pick", // param 1 is source, param 2 is location name
+                        "type": "world_pick", // param 1 is what, param 2 is how many, param 3 is source, param 4 is location name
                         "type_params": [ "card", 1, "all_players", "front" ], // Pick 1 card from the world, can pick from the 'front' area of every player
                         "primitives": [
                             {
@@ -671,13 +689,35 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                             "size": 60,
                             "text": "{0} has won the round!",
                             "tokens": "$player.name",
-                            "time": -1
-                        }
+                            "time": -1,
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "increment()",
+                                "params": [ "$player.score", 1 ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "condition": {
+                                    "endpoint": "is_equal()",
+                                    "params": [ "$player.score", "$globals.score_to_win" ]
+                                },
+                                "params": [
+                                    "game_won", "$player"
+                                ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "params": [
+                                    "round_intermission", "round_start"
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
             {
-                "state_name": "round_lost", // TODO: Player loses card, picked by the person who's skull they revealed, if no cards left -> out of game!, else go back to round_start
+                "state_name": "round_lost",
                 "state_params": [
                     {
                         "key": "loser",
@@ -691,16 +731,178 @@ A ruleset file can either refer to outside resources (Such as `decks` and `card 
                 "state_type": "grandstand",
                 "state_type_param": "$state.winner",
                 "actions": [
-
+                    {
+                        "action_name": "recall_cards_to_pick_from",
+                        "type": "auto",
+                        "primitives": [
+                            {
+                                "endpoint": "return_to_owner()",
+                                "params": [ // Where is location found? the loser, What's the location called? front, Where do the cards go? hand
+                                     "$state.loser", "front", "hand"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "Pick card to discard!",
+                        "type": "hand_pick",
+                        "type_params": [
+                            "other", // target
+                            "$state.loser.hand", // hand reference
+                            1, // how many?
+                            false // Can the player see what the cards are?
+                        ],
+                        "primitives": [
+                            {
+                                "endpoint": "discard_card()",
+                                "params": "$state.hand_pick"
+                            },
+                            {
+                                "endpoint": "dismiss_player()", // Make the player always an inactive player + dismissed, so they cannot perform action prompts and can only spectate. Get them back with a recall_players()
+                                "condition": {
+                                    "endpoint": "is_equal()",
+                                    "params": [ 
+                                        {
+                                            "endpoint": "count_cards()",
+                                            "params": "$state.loser.hand"
+                                        },
+                                        0
+                                    ]
+                                },
+                                "params": "$state.loser"
+                            }, // TODO: Add somewhere where we change value of $globals.start_player to the loser, and if they are eliminated to set it to the person who would go after them (the check if eliminated may be done by the round_robin turn mechanism automatically)
+                            {
+                                "endpoint": "state_transition()",
+                                "condition": {
+                                    "endpoint": "is_equal()",
+                                    "params": [
+                                        "count_nondismissed_players()",
+                                        1
+                                    ]
+                                },
+                                "params": [
+                                    "game_won", "$state.winner"
+                                ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "params": [ "round_intermission", "round_start" ]
+                            }
+                        ]
+                    }
                 ]
-
-                
             },
             {
-                // intermission WIP
+                "state_name": "game_won",
+                "state_params": [
+                    {
+                        "key": "winner",
+                        "type": "player"
+                    }
+                ],
+                "state_type": "concurrent",
+                "actions": [
+                    {
+                        "action_name": "announce_winner",
+                        "type": "auto",
+                        "action_message": {
+                            "type": "center_screen",
+                            "size": 60,
+                            "text": "{0} has won!",
+                            "tokens": "$state.winner.name",
+                            "time": -1,
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "set_global_data()",
+                                "params": [ "$globals.start_player", "$state.winner" ]
+                            },
+                            {
+                                "endpoint": "recall_players()"
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "play_again",
+                        "type": "vote_button",
+                        "type_param": [
+                            "Play again!", // button text
+                            "pregame", // What state to transition to
+                            "change_deck" // other possible vote
+                        ],
+                    },
+                    {
+                        "action_name": "change_deck",
+                        "type": "vote_button",
+                        "type_param": [
+                            "Change deck first!",
+                            "deck_selection",
+                            "play_again"
+                        ],
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_equal()",
+                            "params": [ "active_players()", 0 ]
+                        },
+                        "primitives": {
+                            "endpoint": "state_transition()",
+                            "params": [ "round_intermission", "$state.vote" ]
+                        }
+                    }
+                ]
             },
             {
-
+                "state_name": "round_intermission",
+                "state_params": {
+                    "key": "transition_to",
+                    "type": "string"
+                },
+                "state_type": "auto",
+                "actions": [
+                    {
+                        "action_name": "clear_field",
+                        "type": "auto",
+                        "primitives": [
+                            {
+                                "endpoint": "return_to_owner()",
+                                "params": [ // Where is location found? all_players, What's the location called? front, Where do the cards go? hand
+                                     "all_players", "front", "hand"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "reset_decks",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "any_equal()",
+                            "params": [ "$state.transition_to", [ "pregame", "deck_selection" ] ]
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "reset_decks()",
+                                "params": [ // Where? all_players, Which? deck.
+                                    "all_players", "deck"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "primitives": [
+                            {
+                                "endpoint": "state_transition()",
+                                "params": [
+                                    "$action.transition_to"
+                                ]
+                            }
+                        ]
+                    }
+                ]
             }
         ]
     },
