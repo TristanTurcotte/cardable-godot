@@ -1,0 +1,95 @@
+{
+    "cardset": {
+        "set_name": "Standard Playing Cards",
+        "card_dimensions": {
+            "width": 90,
+            "height": 135
+        },
+        "card_back": "Card_back_01.svg.png",
+        "suits": [
+            {
+                "suit_name": "Hearts",
+                "suit_id": 0,
+                "suit_colour": {
+                    "red": 255,
+                    "green": 0,
+                    "blue": 0
+                },
+                "texture_folder_override": "hearts"
+            }
+        ],
+        "symmetrical_deck": true,
+        "cards": [
+            {
+                "card_name": "Ace",
+                "card_id": 0,
+                "card_value": 1
+            },
+            {
+                "card_name": "Two",
+                "card_id": 1,
+                "card_value": 2
+            },
+            {
+                "card_name": "Three",
+                "card_id": 2,
+                "card_value": 3
+            },
+            {
+                "card_name": "Four",
+                "card_id": 3,
+                "card_value": 4
+            },
+            {
+                "card_name": "Five",
+                "card_id": 4,
+                "card_value": 5
+            },
+            {
+                "card_name": "Six",
+                "card_id": 5,
+                "card_value": 6
+            },
+            {
+                "card_name": "Seven",
+                "card_id": 6,
+                "card_value": 7
+            },
+            {
+                "card_name": "Eight",
+                "card_id": 7,
+                "card_value": 8
+            },
+            {
+                "card_name": "Nine",
+                "card_id": 8,
+                "card_value": 9
+            },
+            {
+                "card_name": "Ten",
+                "card_id": 9,
+                "card_value": 10
+            },
+            {
+                "card_name": "Jack",
+                "card_id": 10,
+                "card_value": 11
+            },
+            {
+                "card_name": "Queen",
+                "card_id": 11,
+                "card_value": 12
+            },
+            {
+                "card_name": "King",
+                "card_id": 12,
+                "card_value": 13
+            },
+            {
+                "card_name": "Joker",
+                "card_id": 13,
+                "card_value": -1
+            }
+        ]
+    }
+}

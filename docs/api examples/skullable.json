@@ -1,0 +1,671 @@
+{
+    "cardset": {
+        "set_name": "Skull & Flowers",
+        "card_dimensions": {
+            "width": 150,
+            "height": 150
+        },
+        "suits": [
+            {
+                "suit_name": "Vikings",
+                "suit_id": 0,
+                "suit_colour": {
+                    "red": 0,
+                    "green": 255,
+                    "blue": 0
+                },
+                "suit_back_override": "viking_back.png"
+            },
+            {
+                "suit_name": "Samurai",
+                "suit_id": 1,
+                "suit_colour": {
+                    "red": 255,
+                    "green": 0,
+                    "blue": 0
+                },
+                "suit_back_override": "samurai_back.png"
+            },
+            {
+                "suit_name": "Shamen",
+                "suit_id": 2,
+                "suit_colour": {
+                    "red": 241,
+                    "green": 202,
+                    "blue": 121
+                },
+                "suit_back_override": "shamen_back.png"
+            },
+            {
+                "suit_name": "Voodoo",
+                "suit_id": 3,
+                "suit_colour": {
+                    "red": 106,
+                    "green": 32,
+                    "blue": 89
+                },
+                "suit_back_override": "voodoo_back.png"
+            },
+            {
+                "suit_name": "Zulu",
+                "suit_id": 4,
+                "suit_colour": {
+                    "red": 0,
+                    "green": 0,
+                    "blue": 255
+                },
+                "suit_back_override": "zulu_back.png"
+            },
+            {
+                "suit_name": "Animist",
+                "suit_id": 5,
+                "suit_colour": {
+                    "red": 102,
+                    "green": 100,
+                    "blue": 194
+                },
+                "suit_back_override": "animist_back.png"
+            }
+        ],
+        "symmetrical_deck": true,
+        "cards": [
+            {
+                "card_name": "Skull",
+                "card_id": 0,
+                "card_value": 1
+            },
+            {
+                "card_name": "Flower",
+                "card_id": 1,
+                "card_value": 0
+            }
+        ]
+    },
+    "deck": [
+        {
+            "deck_name": "Vikings",
+            "cardset": "Skull & Flowers",
+            "content": [
+                0,
+                1,
+                1,
+                1
+            ]
+        },
+        {
+            "deck_name": "Samurai",
+            "cardset": "Skull & Flowers",
+            "content": [
+                2,
+                3,
+                3,
+                3
+            ]
+        },
+        {
+            "deck_name": "Shamen",
+            "cardset": "Skull & Flowers",
+            "content": [
+                4,
+                5,
+                5,
+                5
+            ]
+        },
+        {
+            "deck_name": "Voodoo",
+            "cardset": "Skull & Flowers",
+            "content": [
+                6,
+                7,
+                7,
+                7
+            ]
+        },
+        {
+            "deck_name": "Zulu",
+            "cardset": "Skull & Flowers",
+            "content": [
+                8,
+                9,
+                9,
+                9
+            ]
+        },
+        {
+            "deck_name": "Animist",
+            "cardset": "Skull & Flowers",
+            "content": [
+                10,
+                11,
+                11,
+                11
+            ]
+        }
+    ],
+    "ruleset": {
+        "ruleset_name": "Skullable",
+        "description": "Game of bluffs & strategy!",
+        "min_players": 3,
+        "max_players": 6,
+        "cardsets": [
+            "Skull & Flowers"
+        ],
+        "decks": [
+            "Vikings",
+            "Samurai",
+            "Shamen",
+            "Voodoo",
+            "Zulu",
+            "Animist"
+        ],
+        "game_area": {
+        },
+        "global_data": [
+            {
+                "key": "start_player",
+                "value": "",
+                "type": "player"
+            },
+            {
+                "key": "placed_cards",
+                "value": 0
+            }
+        ],
+        "game_state": [
+            {
+                "state_name": "deck_selection",
+                "state_type": "auto",
+                "actions": [
+                    {
+                        "action_name": "pick_deck",
+                        "type": "auto",
+                        "primitives": {
+                            "endpoint": "pick_deck()",
+                            "params": [
+                                "$game.decks",
+                                "$globals.start_player"
+                            ]
+                        }
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "primitives": {
+                            "endpoint": "state_transition()",
+                            "params": "pregame"
+                        }
+                    }
+                ]
+            },
+            {
+                "state_name": "pregame",
+                "state_type": "auto",
+                "actions": [
+                    {
+                        "action_name": "choose_player",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_empty",
+                            "params": "$globals.start_player"
+                        },
+                        "primitives": {
+                            "endpoint": "pick_random_player()",
+                            "params": "$globals.start_player"
+                        }
+                    },
+                    {
+                        "action_name": "give_cards",
+                        "type": "auto",
+                        "primitives": [
+                            {
+                                "endpoint": "empty_hands()",
+                                "params": "all"
+                            },
+                            {
+                                "endpoint": "draw_cards()",
+                                "params": [
+                                    "all",
+                                    4,
+                                    "$player.deck",
+                                    "$player.hand"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "primitives": {
+                            "endpoint": "state_transition()",
+                            "params": "round_start"
+                        }
+                    }
+                ]
+            },
+            {
+                "state_name": "round_start",
+                "state_type": "concurrent",
+                "actions": [
+                    {
+                        "action_name": "Place card facedown",
+                        "action_message": {
+                            "type": "center_screen",
+                            "size": 60,
+                            "text": "You must choose a card from your hand to play facedown!",
+                            "time": -1
+                        },
+                        "type": "hand_pick",
+                        "type_params": 1,
+                        "primitives": [
+                            {
+                                "endpoint": "place_card()",
+                                "params": [
+                                    "$action.hand_pick",
+                                    "$player.front",
+                                    true
+                                ]
+                            },
+                            {
+                                "endpoint": "increment()",
+                                "params": [
+                                    "$globals.placed_cards",
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "transition",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_equal()",
+                            "params": [
+                                "active_players()",
+                                0
+                            ]
+                        },
+                        "primitives": {
+                            "endpoint": "state_transition()",
+                            "params": "round_phase_one"
+                        }
+                    }
+                ]
+            },
+            {
+                "state_name": "round_phase_one",
+                "state_type": "round_robin",
+                "state_type_param": "$globals.start_player",
+                "actions": [
+                    {
+                        "action_name": "Place card facedown",
+                        "type": "hand_pick",
+                        "type_params": 1,
+                        "condition": {
+                            "endpoint": "is_not_equal()",
+                            "params": [
+                                "$player.cards_in_hand",
+                                0
+                            ]
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "place_card()",
+                                "params": [
+                                    "$action.hand_pick",
+                                    "$player.front",
+                                    true
+                                ]
+                            },
+                            {
+                                "endpoint": "increment()",
+                                "params": [
+                                    "$globals.placed_cards",
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "Bet # of flowers flipped in a row",
+                        "type": "button",
+                        "action_data": {
+                            "key": "player_bet",
+                            "type": "number"
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "prompt_number()",
+                                "params": [
+                                    "$action.player_bet",
+                                    1,
+                                    "$globals.placed_cards"
+                                ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "params": [
+                                    "round_phase_two",
+                                    "$player",
+                                    "$action.player_bet"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "state_name": "round_phase_two",
+                "state_params": [
+                    {
+                        "param": "initiating_player",
+                        "type": "player"
+                    },
+                    {
+                        "param": "origin_bet",
+                        "type": "number"
+                    }
+                ],
+                "state_data": [
+                    {
+                        "key": "winning_player",
+                        "value": "$state_params.initiating_player"
+                    },
+                    {
+                        "key": "current_bet",
+                        "value": "$state_params.origin_bet"
+                    }
+                ],
+                "state_type": "round_robin",
+                "state_type_param": {
+                    "endpoint": "next_player()",
+                    "params": "$state.initiating_player"
+                },
+                "actions": [
+                    {
+                        "action_name": "check_winner",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_equal()",
+                            "params": [
+                                "$player",
+                                "$state.winning_player"
+                            ]
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "state_transition()",
+                                "params": [
+                                    "round_phase_three",
+                                    "$player",
+                                    "$state.current_bet"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "Pass",
+                        "type": "button",
+                        "primitives": [
+                            {
+                                "endpoint": "pass_in_round_robin()",
+                                "params": [
+                                    "$player",
+                                    "state_transition"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "Can you flip more flowers than the other person? Bet higher!",
+                        "action_message": {
+                            "type": "bottom_center_screen",
+                            "size": 60,
+                            "text": "Bet higher than {0} or pass!",
+                            "tokens": "$state.current_bet",
+                            "time": -1
+                        },
+                        "action_data": {
+                            "key": "player_bet",
+                            "type": "number"
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "prompt_number_excl_incl()",
+                                "params": [
+                                    "$action.player_bet",
+                                    "$state.current_bet",
+                                    "$globals.placed_cards"
+                                ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "condition": {
+                                    "endpoint": "is_equal()",
+                                    "params": [
+                                        "$action.player_bet",
+                                        "$globals.placed_cards"
+                                    ]
+                                },
+                                "params": [
+                                    "round_phase_three",
+                                    "$player",
+                                    "$action.player_bet"
+                                ]
+                            },
+                            {
+                                "endpoint": "set_state_data()",
+                                "params": [
+                                    "$state.current_bet",
+                                    "$action.player_bet"
+                                ]
+                            },
+                            {
+                                "endpoint": "set_state_data()",
+                                "params": [
+                                    "$state.winning_player",
+                                    "$player"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "state_name": "round_phase_three",
+                "state_params": [
+                    {
+                        "key": "flower_picker",
+                        "type": "player"
+                    },
+                    {
+                        "key": "count",
+                        "type": "number"
+                    }
+                ],
+                "state_type": "grandstand",
+                "state_type_param": "$state.flower_picker",
+                "actions": [
+                    {
+                        "action_name": "check_winner",
+                        "type": "auto",
+                        "condition": {
+                            "endpoint": "is_less_than_equal()",
+                            "params": [
+                                "$state.count",
+                                0
+                            ]
+                        },
+                        "primitives": [
+                            {
+                                "endpoint": "state_transition()",
+                                "params": [
+                                    "round_won",
+                                    "$player"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "reveal_own_cards",
+                        "condition": {
+                            "endpoint": "is_not_equal()",
+                            "params": [
+                                {
+                                    "endpoint": "count_cards()",
+                                    "params": "$player.front"
+                                },
+                                0
+                            ]
+                        },
+                        "action_message": {
+                            "type": "bottom_center_screen",
+                            "size": 60,
+                            "text": "You must reveal all your cards before other players' cards!",
+                            "time": -1
+                        },
+                        "type": "world_pick",
+                        "type_params": [
+                            "card",
+                            1,
+                            "$player",
+                            "front"
+                        ],
+                        "primitives": [
+                            {
+                                "endpoint": "flip_card()",
+                                "params": "$action.world_pick"
+                            },
+                            {
+                                "endpoint": "decrement()",
+                                "params": [
+                                    "$state.count",
+                                    1
+                                ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "condition": {
+                                    "endpoint": "is_equal()",
+                                    "params": [
+                                        {
+                                            "endpoint": "card_value()",
+                                            "params": "$action.world_pick"
+                                        },
+                                        1
+                                    ]
+                                },
+                                "params": [
+                                    "round_lost",
+                                    "$player",
+                                    "$player"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "action_name": "reveal_others_cards",
+                        "condition": {
+                            "endpoint": "is_equal()",
+                            "params": [
+                                {
+                                    "endpoint": "count_cards()",
+                                    "params": "$player.front"
+                                },
+                                0
+                            ]
+                        },
+                        "action_message": {
+                            "type": "bottom_center_screen",
+                            "size": 60,
+                            "text": "You must reveal {0} more cards of other players!",
+                            "tokens": "$state.count",
+                            "time": -1
+                        },
+                        "type": "world_pick",
+                        "type_params": [
+                            "card",
+                            1,
+                            "all_players",
+                            "front"
+                        ],
+                        "primitives": [
+                            {
+                                "endpoint": "flip_card()",
+                                "params": "$action.world_pick"
+                            },
+                            {
+                                "endpoint": "decrement()",
+                                "params": [
+                                    "$state.count",
+                                    1
+                                ]
+                            },
+                            {
+                                "endpoint": "state_transition()",
+                                "condition": {
+                                    "endpoint": "is_equal()",
+                                    "params": [
+                                        {
+                                            "endpoint": "card_value()",
+                                            "params": "$action.world_pick"
+                                        },
+                                        1
+                                    ]
+                                },
+                                "params": [
+                                    "round_lost",
+                                    "$player",
+                                    {
+                                        "endpoint": "get_player_from_card()",
+                                        "params": "$action.world_pick"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "state_name": "round_won",
+                "state_params": {
+                    "key": "winner",
+                    "type": "player"
+                },
+                "state_type": "auto",
+                "actions": [
+                    {
+                        "action_name": "announce_winner",
+                        "type": "auto",
+                        "action_message": {
+                            "type": "center_screen",
+                            "size": 60,
+                            "text": "{0} has won the round!",
+                            "tokens": "$player.name",
+                            "time": -1
+                        }
+                    }
+                ]
+            },
+            {
+                "state_name": "round_lost",
+                "state_params": [
+                    {
+                        "key": "loser",
+                        "type": "player"
+                    },
+                    {
+                        "key": "winner",
+                        "type": "player"
+                    }
+                ],
+                "state_type": "grandstand",
+                "state_type_param": "$state.winner",
+                "actions": []
+            },
+            {
+            },
+            {}
+        ]
+    }
+}
